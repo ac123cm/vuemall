@@ -1,28 +1,46 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <router-view></router-view>
+    <tar-bar>
+      <!-- slot已被弃用 -->
+      <tar-bar-item path="/home">
+        <img slot="item-icon" src="./assets/img/tabbar/home.svg" alt="">
+        <img slot="item-icon-active" src="./assets/img/tabbar/home_active.svg" alt="">
+        <div slot="item-text">首页</div>
+      </tar-bar-item>
+      <tar-bar-item path="/category">
+        <img slot="item-icon" src="./assets/img/tabbar/category.svg" alt="">
+        <img slot="item-icon-active" src="./assets/img/tabbar/category_active.svg" alt="">
+        <div slot="item-text">分类</div>
+      </tar-bar-item>
+      <tar-bar-item path="cart" activeColor="deeppink">
+        <img slot="item-icon" src="./assets/img/tabbar/shopcart.svg" alt="">
+        <img slot="item-icon-active" src="./assets/img/tabbar/shopcart_active.svg" alt="">
+        <div slot="item-text">购物车</div>
+      </tar-bar-item>
+      <tar-bar-item path="profile" activeColor="deeppink">
+        <img slot="item-icon" src="./assets/img/tabbar/profile.svg" alt="">
+        <img slot="item-icon-active" src="./assets/img/tabbar/profile_active.svg" alt="">
+        <div slot="item-text">我的</div>
+      </tar-bar-item>
+    </tar-bar>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import TarBar from './components/common/tarbar/TarBar'
+import TarBarItem from './components/common/tarbar/TarBarItem'
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
-  }
-}
+    TarBar,
+    TarBarItem
+  },
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+@import "./assets/css/base.css";
+
 </style>
