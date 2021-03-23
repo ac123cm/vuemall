@@ -13,47 +13,11 @@
     <tab-control
       class="tab-control"
       :titles="['流行', '新款', '精选']"
+      @tabClick="tabClick"
     ></tab-control>
     <!-- 商品展示 -->
-    <goods-list :goods="goods['pop'].list"></goods-list>
-    <ul>
-      <li>111</li>
-      <li>222</li>
-      <li>333</li>
-      <li>444</li>
-      <li>555</li>
-      <li>666</li>
-      <li>111</li>
-      <li>222</li>
-      <li>333</li>
-      <li>444</li>
-      <li>555</li>
-      <li>666</li>
-      <li>111</li>
-      <li>222</li>
-      <li>333</li>
-      <li>444</li>
-      <li>555</li>
-      <li>666</li>
-      <li>111</li>
-      <li>222</li>
-      <li>333</li>
-      <li>444</li>
-      <li>555</li>
-      <li>666</li>
-      <li>111</li>
-      <li>222</li>
-      <li>333</li>
-      <li>444</li>
-      <li>555</li>
-      <li>666</li>
-      <li>111</li>
-      <li>222</li>
-      <li>333</li>
-      <li>444</li>
-      <li>555</li>
-      <li>666</li>
-    </ul>
+    <goods-list :goods="showGoods"></goods-list>
+    <back-top></back-top>
   </div>
 </template>
 
@@ -62,6 +26,7 @@ import NavBar from "@/components/common/navbar/NavBar";
 import TabControl from "@/components/content/tabcontrol/TabControl";
 import GoodsList from '@/components/content/goods/GoodsList'
 import GoodsListItem from '@/components/content/goods/GoodsListItem'
+import BackTop from '@/components/content/backTop/BackTop'
 
 import HomeSwiper from "./childComps/HomeSwiper";
 import RecommendView from "./childComps/RecommendView";
@@ -78,7 +43,8 @@ export default {
     Feature,
     TabControl,
     GoodsList,
-    GoodsListItem
+    GoodsListItem,
+    BackTop
   },
   data() {
     return {
@@ -91,7 +57,14 @@ export default {
         'new': { page: 0, list: [] },
         'sell': { page: 0, list: [] },
       },
+      // 默认当前类型 'pop'
+      currentType: 'pop'
     };
+  },
+  computed: {
+    showGoods() {
+      return this.goods[this.currentType].list
+    }
   },
   created() {
     // 1.请求多个数据
@@ -102,6 +75,25 @@ export default {
     this.getHomeGoods("sell");
   },
   methods: {
+    /**
+     * 事件监听相关
+     */
+    tabClick(index) {
+      switch (index) {
+        case 0:
+          this.currentTyoe = 'pop'
+          break
+        case 1:
+          this.currentType = 'new'
+          break
+        case 2:
+          this.currentType = 'sell'
+          break
+      }
+    },
+    /**
+     * 网络请求相关
+     */
     getHomeMultidata() {
       getHomeMultidata().then((res) => {
         // console.log(res)
@@ -134,5 +126,6 @@ export default {
 .tab-control {
   position: sticky;
   top: 44px;
+  z-index: 9;
 }
 </style>
