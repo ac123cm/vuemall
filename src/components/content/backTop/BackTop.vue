@@ -9,7 +9,7 @@ export default {
     name: 'BackTop',
     methods: {
         backClick() {
-            // console.log("回到顶部");
+            console.log('返回顶部');
         }
     },
 }

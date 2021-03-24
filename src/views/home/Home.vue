@@ -17,6 +17,7 @@
     ></tab-control>
     <!-- 商品展示 -->
     <goods-list :goods="showGoods"></goods-list>
+    <!-- 返回顶部 -->
     <back-top></back-top>
   </div>
 </template>
@@ -24,9 +25,9 @@
 <script>
 import NavBar from "@/components/common/navbar/NavBar";
 import TabControl from "@/components/content/tabcontrol/TabControl";
-import GoodsList from '@/components/content/goods/GoodsList'
-import GoodsListItem from '@/components/content/goods/GoodsListItem'
-import BackTop from '@/components/content/backTop/BackTop'
+import GoodsList from "@/components/content/goods/GoodsList";
+import GoodsListItem from "@/components/content/goods/GoodsListItem";
+import BackTop from "@/components/content/backTop/BackTop";
 
 import HomeSwiper from "./childComps/HomeSwiper";
 import RecommendView from "./childComps/RecommendView";
@@ -44,7 +45,7 @@ export default {
     TabControl,
     GoodsList,
     GoodsListItem,
-    BackTop
+    BackTop,
   },
   data() {
     return {
@@ -53,19 +54,32 @@ export default {
       // 数据模型
       goods: {
         // 默认无数据
-        'pop': { page: 0, list: [] },
-        'new': { page: 0, list: [] },
-        'sell': { page: 0, list: [] },
+        pop: { page: 0, list: [] },
+        new: { page: 0, list: [] },
+        sell: { page: 0, list: [] },
       },
       // 默认当前类型 'pop'
-      currentType: 'pop'
+      currentType: "pop",
+      saveY: 0,
     };
   },
   computed: {
     showGoods() {
-      return this.goods[this.currentType].list
-    }
+      return this.goods[this.currentType].list;
+    },
   },
+  /**
+   * 暂时未做，
+   */
+  // destroyed() {
+  //   console.log("home destroyed");
+  // },
+  // activated() {
+  //   this.$ref.scroll.scrollTo(0, this.saveY, 0)
+  // },
+  // deactivated() {
+  //   this.saveY = -1000
+  // },
   created() {
     // 1.请求多个数据
     this.getHomeMultidata();
@@ -81,33 +95,36 @@ export default {
     tabClick(index) {
       switch (index) {
         case 0:
-          this.currentTyoe = 'pop'
-          break
+          this.currentTyoe = "pop";
+          break;
         case 1:
-          this.currentType = 'new'
-          break
+          this.currentType = "new";
+          break;
         case 2:
-          this.currentType = 'sell'
-          break
+          this.currentType = "sell";
+          break;
       }
     },
+    // backClick() {
+    //   this.$parent.$children[1].scroll.scrollTo(0, 0)
+    // },
     /**
      * 网络请求相关
      */
     getHomeMultidata() {
       getHomeMultidata().then((res) => {
         // console.log(res)
-        this.banners = res.data.banner.list
-        this.recommends = res.data.recommend.list
-      })
+        this.banners = res.data.banner.list;
+        this.recommends = res.data.recommend.list;
+      });
     },
     getHomeGoods(type) {
-      const page = this.goods[type].page + 1
+      const page = this.goods[type].page + 1;
       getHomeGoods(type, page).then((res) => {
         // console.log(res)
-        this.goods[type].list.push(...res.data.list)
-        this.goods[type].page += 1
-      })
+        this.goods[type].list.push(...res.data.list);
+        this.goods[type].page += 1;
+      });
     },
   },
 };

@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" exclude="Detail">
     <router-view></router-view>
     <main-tab-bar></main-tab-bar>
   </div>
