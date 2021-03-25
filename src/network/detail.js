@@ -9,6 +9,7 @@ export function getDetail(iid) {
     })
 }
 
+// 商品数据
 export class Goods {
     constructor(itemInfo, columns, services) {
         this.title = itemInfo.title
@@ -22,6 +23,7 @@ export class Goods {
     }
 }
 
+// 店铺数据
 export class Shop {
     constructor(shopInfo) {
         this.logo = shopInfo.shopLogo;
@@ -30,5 +32,14 @@ export class Shop {
         this.sells = shopInfo.cSells;
         this.score = shopInfo.score;
         this.goodsCount = shopInfo.cGoods;
+    }
+}
+
+// 尺寸数据
+export class GoodsParams {
+    constructor(info, rule) {
+        this.image = info.images ? info.images[0] : ''
+        this.infos = info.set
+        this.sizes = rule.tables
     }
 }
