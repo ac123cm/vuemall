@@ -1,9 +1,7 @@
 <template>
   <div id="home">
     <!-- 导航栏 -->
-    <nav-bar class="home-nav">
-      <div slot="center">购物街</div>
-    </nav-bar>
+    <nav-bar class="home-nav"><div slot="center">购物街</div> </nav-bar>
     <!-- 轮播图 -->
     <home-swiper :banners="banners"></home-swiper>
     <!-- 推荐 -->
@@ -18,7 +16,8 @@
     <!-- 商品展示 -->
     <goods-list :goods="showGoods"></goods-list>
     <!-- 返回顶部 -->
-    <back-top></back-top>
+    <!-- 回到顶部,监听组件的原生事件必须要用native修饰符变成原生组件 -->
+    <back-top @click.native="backClick"></back-top>
   </div>
 </template>
 
@@ -105,9 +104,9 @@ export default {
           break;
       }
     },
-    // backClick() {
-    //   this.$parent.$children[1].scroll.scrollTo(0, 0)
-    // },
+    backClick() {
+      window.scrollTo(0, 0);
+    },
     /**
      * 网络请求相关
      */
@@ -135,9 +134,7 @@ export default {
   background-color: var(--color-tint);
   color: #fff;
   position: sticky;
-  left: 0;
-  right: 0;
-  top: 0;
+  top: 0px;
   z-index: 1000;
 }
 .tab-control {

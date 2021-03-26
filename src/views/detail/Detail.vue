@@ -13,6 +13,10 @@
     ></detail-goods-info>
     <!-- 参数信息 -->
     <detail-param-info :param-info="paramInfo"></detail-param-info>
+    <!-- 评论信息 -->
+    <detail-comment-info :comment-info="commentInfo"></detail-comment-info>
+    <!-- 推荐 -->
+    <goods-list :goods="recommends"></goods-list>
   </div>
 </template>
 
@@ -22,9 +26,18 @@ import DetailSwiper from "./chlidComps/DetailSwiper";
 import DetailBaseInfo from "./chlidComps/DetailBaseInfo";
 import DetailShopInfo from "./chlidComps/DetailShopInfo";
 import DetailGoodsInfo from "./chlidComps/DetailGoodsInfo";
-import DetailParamInfo from './chlidComps/DetailParamInfo'
+import DetailParamInfo from "./chlidComps/DetailParamInfo";
+import DetailCommentInfo from "./chlidComps/DetailCommentInfo";
 
-import { getDetail, Goods, Shop, GoodsParams } from "@/network/detail";
+import GoodsList from "@/components/content/goods/GoodsList";
+
+import {
+  getDetail,
+  Goods,
+  Shop,
+  GoodsParams,
+  getRecommend,
+} from "@/network/detail";
 
 export default {
   name: "Detail",
@@ -34,7 +47,9 @@ export default {
     DetailBaseInfo,
     DetailShopInfo,
     DetailGoodsInfo,
-    DetailParamInfo
+    DetailParamInfo,
+    DetailCommentInfo,
+    GoodsList,
   },
   data() {
     return {
@@ -43,16 +58,19 @@ export default {
       goods: {},
       shop: {},
       detailInfo: {},
-      paramInfo: {}
+      paramInfo: {},
+      commentInfo: {},
+      recommends: [],
     };
   },
   created() {
     // 1.保存存入的iid
     this.iid = this.$route.params.iid;
+
     // 2.根据iid请求详细数据
     getDetail(this.iid).then((res) => {
       // 1.获取数据
-      console.log(res);
+      // console.log(res);
       const data = res.result;
 
       // 2.获取顶部轮播图图片
@@ -72,7 +90,21 @@ export default {
       this.detailInfo = data.detailInfo;
 
       // 6.获取参数信息
-      this.paramInfo = new GoodsParams(data.itemParams.info, data.itemParams.rule)
+      this.paramInfo = new GoodsParams(
+        data.itemParams.info,
+        data.itemParams.rule
+      );
+
+      // 7.取出评论信息
+      if (data.rate.cRate !== 0) {
+        this.commentInfo = data.rate.list[0];
+      }
+    });
+
+    // 3.请求推荐数据
+    getRecommend().then((res) => {
+      // console.log(res);
+      this.recommends = res.data.list;
     });
   },
   methods: {
@@ -83,7 +115,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 #detail {
   position: relative;
   z-index: 9;
