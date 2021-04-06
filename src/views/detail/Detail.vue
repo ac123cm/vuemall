@@ -5,9 +5,14 @@
       @titleClick="titleClick"
     ></detail-nav-bar>
     <ul>
-      <li>{{$store.state.cartList.length}}</li>
+      <li>{{ $store.state.cartList.length }}</li>
     </ul>
-    <scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll">
+    <scroll
+      class="content"
+      ref="scroll"
+      :probe-type="3"
+      @scroll="contentScroll"
+    >
       <detail-swiper :top-images="topImages"></detail-swiper>
       <!-- 商品信息 -->
       <detail-base-info :goods="goods"></detail-base-info>
@@ -33,6 +38,7 @@
     </scroll>
     <detail-bottom-bar @addCart="addToCart"></detail-bottom-bar>
     <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
+    <toast :message="message" :show="show"></toast>
   </div>
 </template>
 
@@ -44,10 +50,11 @@ import DetailShopInfo from "./chlidComps/DetailShopInfo";
 import DetailGoodsInfo from "./chlidComps/DetailGoodsInfo";
 import DetailParamInfo from "./chlidComps/DetailParamInfo";
 import DetailCommentInfo from "./chlidComps/DetailCommentInfo";
-import DetailBottomBar from './chlidComps/DetailBottomBar'
+import DetailBottomBar from "./chlidComps/DetailBottomBar";
 
 import GoodsList from "@/components/content/goods/GoodsList";
 import BackTop from "@/components/content/backTop/BackTop";
+import Toast from "@/components/common/toast/Toast";
 
 import Scroll from "@/components/common/scroll/Scroll";
 
@@ -59,6 +66,8 @@ import {
   getRecommend,
 } from "@/network/detail";
 import { debounce } from "../../../common/uttilts";
+
+import { mapActions } from "vuex";
 
 export default {
   name: "Detail",
@@ -74,6 +83,7 @@ export default {
     Scroll,
     DetailBottomBar,
     BackTop,
+    Toast,
   },
   data() {
     return {
@@ -87,7 +97,9 @@ export default {
       recommends: [],
       themeTopYs: [],
       getThemeTopY: null,
-      isShowBackTop: false
+      isShowBackTop: false,
+      message: "",
+      show: false,
     };
   },
   created() {
@@ -145,8 +157,7 @@ export default {
     }, 100);
   },
   mounted() {},
-  updated() {
-  },
+  updated() {},
   methods: {
     imageLoad() {
       this.$refs.scroll.refresh();
@@ -175,11 +186,24 @@ export default {
       product.desc = this.goods.desc;
       product.price = this.goods.realPrice;
       product.iid = this.iid;
-  
-      // 2.将商品添加到购物车
+
+      // 2.将商品添加到购物车(1.Promise 2.mapActions)
       // this.$store.commit('addCart', product)
-      this.$store.dispatch('addCart', product)
-    }
+      // this.$store.dispatch('addCart', product).then(res => {
+      //   console.log(res); // 3.添加到购物车成功
+      // })
+      // 2.mapActions
+      this.addCart(product).then((res) => {
+        console.log(res);
+        this.show = true;
+        this.message = res;
+        setTimeout(() => {
+          this.show = false;
+          this.message = "";
+        }, 1500);
+      });
+    },
+    ...mapActions(["addCart"]),
   },
 };
 </script>
@@ -204,5 +228,4 @@ export default {
   left: 0;
   right: 0;
 }
-
 </style>
