@@ -1,22 +1,38 @@
 <template>
   <div id="detail">
-    <detail-nav-bar></detail-nav-bar>
-    <detail-swiper :top-images="topImages"></detail-swiper>
-    <!-- 商品信息 -->
-    <detail-base-info :goods="goods"></detail-base-info>
-    <!-- 店铺信息 -->
-    <detail-shop-info :shop="shop"></detail-shop-info>
-    <!-- 商品图片信息 -->
-    <detail-goods-info
-      :detail-info="detailInfo"
-      @imageLoad="imageLoad"
-    ></detail-goods-info>
-    <!-- 参数信息 -->
-    <detail-param-info :param-info="paramInfo"></detail-param-info>
-    <!-- 评论信息 -->
-    <detail-comment-info :comment-info="commentInfo"></detail-comment-info>
-    <!-- 推荐 -->
-    <goods-list :goods="recommends"></goods-list>
+    <detail-nav-bar
+      class="detail-nav"
+      @titleClick="titleClick"
+    ></detail-nav-bar>
+    <ul>
+      <li>{{$store.state.cartList.length}}</li>
+    </ul>
+    <scroll class="content" ref="scroll" :probe-type="3" @scroll="contentScroll">
+      <detail-swiper :top-images="topImages"></detail-swiper>
+      <!-- 商品信息 -->
+      <detail-base-info :goods="goods"></detail-base-info>
+      <!-- 店铺信息 -->
+      <detail-shop-info :shop="shop"></detail-shop-info>
+      <!-- 商品图片信息 -->
+      <detail-goods-info
+        :detail-info="detailInfo"
+        @imageLoad="imageLoad"
+      ></detail-goods-info>
+      <!-- 参数信息 -->
+      <detail-param-info
+        ref="params"
+        :param-info="paramInfo"
+      ></detail-param-info>
+      <!-- 评论信息 -->
+      <detail-comment-info
+        ref="comment"
+        :comment-info="commentInfo"
+      ></detail-comment-info>
+      <!-- 推荐 -->
+      <goods-list ref="recommend" :goods="recommends"></goods-list>
+    </scroll>
+    <detail-bottom-bar @addCart="addToCart"></detail-bottom-bar>
+    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
   </div>
 </template>
 
@@ -28,8 +44,12 @@ import DetailShopInfo from "./chlidComps/DetailShopInfo";
 import DetailGoodsInfo from "./chlidComps/DetailGoodsInfo";
 import DetailParamInfo from "./chlidComps/DetailParamInfo";
 import DetailCommentInfo from "./chlidComps/DetailCommentInfo";
+import DetailBottomBar from './chlidComps/DetailBottomBar'
 
 import GoodsList from "@/components/content/goods/GoodsList";
+import BackTop from "@/components/content/backTop/BackTop";
+
+import Scroll from "@/components/common/scroll/Scroll";
 
 import {
   getDetail,
@@ -38,6 +58,7 @@ import {
   GoodsParams,
   getRecommend,
 } from "@/network/detail";
+import { debounce } from "../../../common/uttilts";
 
 export default {
   name: "Detail",
@@ -50,6 +71,9 @@ export default {
     DetailParamInfo,
     DetailCommentInfo,
     GoodsList,
+    Scroll,
+    DetailBottomBar,
+    BackTop,
   },
   data() {
     return {
@@ -61,6 +85,9 @@ export default {
       paramInfo: {},
       commentInfo: {},
       recommends: [],
+      themeTopYs: [],
+      getThemeTopY: null,
+      isShowBackTop: false
     };
   },
   created() {
@@ -106,11 +133,53 @@ export default {
       // console.log(res);
       this.recommends = res.data.list;
     });
+
+    // 4.给getThemeTopY复制（对进行防抖）
+    this.getThemeTopY = debounce(() => {
+      this.themeTopYs = [];
+      this.themeTopYs.push(0);
+      this.themeTopYs.push(this.$refs.params.$el.offsetTop);
+      this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
+      this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
+      // console.log(this.themeTopYs);
+    }, 100);
+  },
+  mounted() {},
+  updated() {
   },
   methods: {
     imageLoad() {
       this.$refs.scroll.refresh();
+      // this.getThemeTopY();
+      this.themeTopYs = [];
+      this.themeTopYs.push(0);
+      this.themeTopYs.push(this.$refs.params.$el.offsetTop);
+      this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
+      this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
+      console.log(this.themeTopYs);
     },
+    titleClick(index) {
+      this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 200);
+    },
+    backClick() {
+      this.$refs.scroll.scrollTo(0, 0);
+    },
+    contentScroll(position) {
+      this.isShowBackTop = -position.y > 1000;
+    },
+    addToCart() {
+      // 1.获取购物车需要展示的信息（图片、标题、描述、价格、id）
+      const product = {};
+      product.image = this.topImages[0];
+      product.title = this.goods.title;
+      product.desc = this.goods.desc;
+      product.price = this.goods.realPrice;
+      product.iid = this.iid;
+  
+      // 2.将商品添加到购物车
+      // this.$store.commit('addCart', product)
+      this.$store.dispatch('addCart', product)
+    }
   },
 };
 </script>
@@ -121,4 +190,19 @@ export default {
   z-index: 9;
   background-color: #fff;
 }
+
+.detail-nav {
+  position: relative;
+  z-index: 9;
+  background-color: #fff;
+}
+
+.content {
+  position: absolute;
+  top: 41px;
+  bottom: 43px;
+  left: 0;
+  right: 0;
+}
+
 </style>
