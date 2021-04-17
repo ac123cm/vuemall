@@ -1,4 +1,5 @@
 # vuemall
+## 项目演示地址(http://112.74.165.56/)
 
 ## Project setup
 ```
